@@ -195,7 +195,7 @@ function EstadosContables() {
                 )}
                 {doc.archivo && (
                   <a 
-                    href={`${directus.url}/assets/${doc.archivo}`} 
+                    href={`${directus.url}assets/${doc.archivo}`} 
                     target="_blank" 
                     rel="noreferrer"
                     className="btn-primary" 

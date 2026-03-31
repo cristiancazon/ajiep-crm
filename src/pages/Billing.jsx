@@ -203,12 +203,12 @@ function Billing() {
                   </td>
                   <td style={{ padding: '12px' }}>
                     <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
-                      <a href={`${directus.url}/assets/${p.comprobante}`} target="_blank" rel="noreferrer" title="Ver Mi Comprobante" style={{ display: 'flex', alignItems: 'center', gap: '4px', textDecoration: 'none', color: 'var(--primary)', fontSize: '0.8rem', fontWeight: '600' }}>
+                      <a href={`${directus.url}assets/${p.comprobante}`} target="_blank" rel="noreferrer" title="Ver Mi Comprobante" style={{ display: 'flex', alignItems: 'center', gap: '4px', textDecoration: 'none', color: 'var(--primary)', fontSize: '0.8rem', fontWeight: '600' }}>
                         <Eye size={18} /> Comprobante
                       </a>
                       {invoices.find(inv => inv.pago_id === p.id) && (
                         <a 
-                          href={`${directus.url}/assets/${invoices.find(inv => inv.pago_id === p.id).archivo}`} 
+                          href={`${directus.url}assets/${invoices.find(inv => inv.pago_id === p.id).archivo}`} 
                           target="_blank" 
                           rel="noreferrer" 
                           title="Descargar Recibo Oficial"
