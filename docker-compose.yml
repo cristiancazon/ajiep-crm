@@ -7,7 +7,7 @@ services:
     container_name: ajiep-crm
     restart: unless-stopped
     ports:
-      - "3010:80"
+      - "3011:80"
     networks:
       - ajiep-network
 
