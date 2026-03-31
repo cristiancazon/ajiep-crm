@@ -1,0 +1,16 @@
+services:
+  ajiep-crm:
+    build:
+      context: .
+      args:
+        - VITE_DIRECTUS_URL=https://xer.pascalito.com.ar
+    container_name: ajiep-crm
+    restart: unless-stopped
+    ports:
+      - "3000:80"
+    networks:
+      - ajiep-network
+
+networks:
+  ajiep-network:
+    driver: bridge
