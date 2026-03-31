@@ -6,11 +6,20 @@ const DIRECTUS_URL = isLocalhost ? `${window.location.origin}/directus-proxy` : 
 
 console.log('🔗 URL de Directus activa:', DIRECTUS_URL);
 
-// 2. Adaptador de storage para tokens
+// 2. Adaptador de storage para sesión (JWT completo)
 const storage = {
-  get: () => window.localStorage.getItem('directus_auth_token'),
-  set: (value) => window.localStorage.setItem('directus_auth_token', value),
-  remove: () => window.localStorage.removeItem('directus_auth_token'),
+  get: () => {
+    try {
+      const data = window.localStorage.getItem('directus_session');
+      return data ? JSON.parse(data) : null;
+    } catch {
+      return null;
+    }
+  },
+  set: (value) => {
+    window.localStorage.setItem('directus_session', JSON.stringify(value));
+  },
+  remove: () => window.localStorage.removeItem('directus_session'),
 };
 
 export const directus = createDirectus(DIRECTUS_URL)
