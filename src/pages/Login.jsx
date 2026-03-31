@@ -17,14 +17,10 @@ function Login({ onLogin }) {
     setError('');
 
     try {
-      // LA REGLA DE ORO DE DIRECTUS v17: ¡Toma UN SÓLO OBJETO como argumento!
-      await directus.login({ 
-        email: email.trim(), 
-        password: password.trim() 
-      });
+      // Regla de Oro Directus v17: ¡Pasa los argumentos SEPARADOS, no en un objeto!
+      await directus.login(email.trim(), password.trim());
       
-      // El SDK guardó el token nativamente usando su propio modelo de storage interno.
-      // Ahora App.jsx podrá usar readMe() sin que reciba error 401.
+      // Ahora App.jsx podrá usar readMe() sin error 401.
       onLogin();
       
     } catch (err) {

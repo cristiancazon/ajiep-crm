@@ -6,14 +6,11 @@ const DIRECTUS_URL = isLocalhost ? `${window.location.origin}/directus-proxy` : 
 
 console.log('🔗 URL de Directus activa:', DIRECTUS_URL);
 
-// 2. Adaptador de storage para evitar TypeError: f.get is not a function
+// 2. Adaptador de storage para tokens
 const storage = {
-  get: () => {
-    const data = window.localStorage.getItem('directus_data');
-    return data ? JSON.parse(data) : null;
-  },
-  set: (value) => window.localStorage.setItem('directus_data', JSON.stringify(value)),
-  remove: () => window.localStorage.removeItem('directus_data'),
+  get: () => window.localStorage.getItem('directus_auth_token'),
+  set: (value) => window.localStorage.setItem('directus_auth_token', value),
+  remove: () => window.localStorage.removeItem('directus_auth_token'),
 };
 
 export const directus = createDirectus(DIRECTUS_URL)
