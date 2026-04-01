@@ -67,7 +67,7 @@ function Layout({ children, user }) {
 
   const menuItems = [
     { icon: <Home size={20} />, label: 'Dashboard', path: '/' },
-    { icon: <CreditCard size={20} />, label: 'Pagos y Facturas', path: '/billing' },
+    { icon: <CreditCard size={20} />, label: 'Pagos', path: '/billing' },
     { icon: <BookOpen size={20} />, label: 'Biblioteca', path: '/biblio' },
     { icon: <FileText size={20} />, label: 'Estados Contables', path: '/estados-contables' },
     { icon: <Bell size={20} />, label: 'Notificaciones', path: '/notifications' },
