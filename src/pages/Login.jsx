@@ -6,7 +6,7 @@ import { LogIn, Mail, Lock } from 'lucide-react';
 console.log('🔑 Login.jsx restaurado a código limpio');
 
 function Login({ onLogin }) {
-  const [email, setEmail] = useState('');
+  const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
@@ -17,8 +17,16 @@ function Login({ onLogin }) {
     setError('');
 
     try {
-      // Regla de Oro Directus v17: ¡Pasa los argumentos SEPARADOS, no en un objeto!
-      await directus.login(email.trim(), password.trim());
+      // Si el usuario no tiene el dominio @sistema.com, se lo agregamos automáticamente
+      const fullEmail = username.trim().includes('@') 
+        ? username.trim() 
+        : `${username.trim()}@sistema.com`;
+
+      // Usamos objeto para login (requerido por versiones recientes del SDK como la v21 instalada)
+      await directus.login({ 
+        email: fullEmail, 
+        password: password.trim() 
+      });
       
       // Ahora App.jsx podrá usar readMe() sin error 401.
       onLogin();
@@ -45,12 +53,14 @@ function Login({ onLogin }) {
 
         <form onSubmit={handleSubmit}>
           <div style={{ marginBottom: '1.5rem' }}>
-            <label style={{ display: 'block', marginBottom: '0.5rem' }}>Email</label>
+            <label style={{ display: 'block', marginBottom: '0.5rem' }}>Usuario</label>
             <input 
-              type="email" 
-              value={email} 
-              onChange={(e) => setEmail(e.target.value)} 
+              type="text" 
+              value={username} 
+              onChange={(e) => setUsername(e.target.value)} 
               required 
+              autoComplete="username"
+              placeholder="nombre.apellido"
               style={{ width: '100%', padding: '12px', borderRadius: '8px', border: '1px solid var(--outline-variant)' }}
             />
           </div>

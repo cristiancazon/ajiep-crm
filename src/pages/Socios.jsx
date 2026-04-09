@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { directus } from '../lib/directus';
-import { readItems, createItem, updateItem, deleteItem, readMe } from '@directus/sdk';
+import { readItems, createItem, updateItem, deleteItem, readMe, uploadFiles } from '@directus/sdk';
 import { 
   Plus, 
   Edit2, 
@@ -8,7 +8,9 @@ import {
   Users,
   Search,
   X,
-  AlertCircle
+  AlertCircle,
+  Upload,
+  Camera
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
@@ -26,10 +28,11 @@ function Socios() {
     email_contacto: '',
     telefono: '',
     cuit: '',
-    saldo_cuenta_corriente: 0,
-    estado: 'Activo' 
+    estado: 'Activo',
+    avatar: null
   });
   const [saving, setSaving] = useState(false);
+  const [selectedFile, setSelectedFile] = useState(null);
 
   useEffect(() => {
     fetchData();
@@ -61,7 +64,8 @@ function Socios() {
         telefono: socio.telefono || '',
         cuit: socio.cuit || '',
         saldo_cuenta_corriente: socio.saldo_cuenta_corriente || 0,
-        estado: socio.estado || 'Activo'
+        estado: socio.estado || 'Activo',
+        avatar: socio.avatar || null
       });
     } else {
       setEditingSocio(null);
@@ -71,9 +75,11 @@ function Socios() {
         telefono: '',
         cuit: '',
         saldo_cuenta_corriente: 0,
-        estado: 'Activo'
+        estado: 'Activo',
+        avatar: null
       });
     }
+    setSelectedFile(null);
     setIsModalOpen(true);
   };
 
@@ -86,13 +92,24 @@ function Socios() {
     e.preventDefault();
     setSaving(true);
     try {
+      let avatarId = formData.avatar;
+
+      // 1. Subir logo si hay uno seleccionado
+      if (selectedFile) {
+        const fileData = new FormData();
+        fileData.append('file', selectedFile);
+        const uploadRes = await directus.request(uploadFiles(fileData));
+        avatarId = Array.isArray(uploadRes) ? uploadRes[0].id : uploadRes.id;
+      }
+
       const payload = {
         nombre: formData.nombre.trim(),
         email_contacto: formData.email_contacto.trim(),
         telefono: formData.telefono.trim(),
-        cuit: formData.cuit.trim(),
+        cuit: (formData.cuit || '123456').trim(),
         saldo_cuenta_corriente: parseFloat(formData.saldo_cuenta_corriente) || 0,
-        estado: formData.estado
+        estado: formData.estado,
+        avatar: avatarId
       };
 
       if (editingSocio) {
@@ -124,9 +141,7 @@ function Socios() {
   };
 
   const filteredSocios = socios.filter(s => 
-    s.nombre?.toLowerCase().includes(searchTerm.toLowerCase()) || 
-    s.email_contacto?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    s.cuit?.includes(searchTerm)
+    s.nombre?.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   if (loading) return <div>Cargando directorio...</div>;
@@ -149,7 +164,7 @@ function Socios() {
             <Search size={18} color="var(--on-surface-variant)" />
             <input 
               type="text" 
-              placeholder="Buscar socio por nombre o CUIT..." 
+              placeholder="Buscar socio por nombre..." 
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               style={{ border: 'none', background: 'transparent', outline: 'none', width: '100%', fontSize: '0.9rem' }}
@@ -176,9 +191,8 @@ function Socios() {
         <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left' }}>
           <thead>
             <tr style={{ borderBottom: '2px solid var(--outline-variant)' }}>
-              <th style={{ padding: '16px', fontWeight: '600', color: 'var(--on-surface-variant)' }}>Nombre / Contacto</th>
-              <th style={{ padding: '16px', fontWeight: '600', color: 'var(--on-surface-variant)' }}>CUIT</th>
-              <th style={{ padding: '16px', fontWeight: '600', color: 'var(--on-surface-variant)' }}>Saldo ($)</th>
+              <th style={{ padding: '16px', fontWeight: '600', color: 'var(--on-surface-variant)', width: '80px' }}>Logo</th>
+              <th style={{ padding: '16px', fontWeight: '600', color: 'var(--on-surface-variant)' }}>Nombre</th>
               <th style={{ padding: '16px', fontWeight: '600', color: 'var(--on-surface-variant)' }}>Estado</th>
               <th style={{ padding: '16px', fontWeight: '600', color: 'var(--on-surface-variant)', textAlign: 'right' }}>Acciones</th>
             </tr>
@@ -187,12 +201,20 @@ function Socios() {
             {filteredSocios.map(socio => (
               <tr key={socio.id} style={{ borderBottom: '1px solid var(--outline-variant)' }}>
                 <td style={{ padding: '16px' }}>
-                  <div style={{ fontWeight: '600' }}>{socio.nombre || 'Sin nombre'}</div>
-                  <div style={{ fontSize: '0.85rem', color: 'var(--on-surface-variant)' }}>{socio.email_contacto || '-'} ({socio.telefono || '-'})</div>
+                  {socio.avatar ? (
+                    <img 
+                      src={`${directus.url}assets/${socio.avatar}?width=60&height=60&fit=cover`} 
+                      alt={socio.nombre} 
+                      style={{ width: '60px', height: '60px', borderRadius: '50%', objectFit: 'cover', border: '1px solid var(--outline-variant)' }} 
+                    />
+                  ) : (
+                    <div style={{ width: '60px', height: '60px', borderRadius: '50%', backgroundColor: 'var(--surface-container-high)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--on-surface-variant)' }}>
+                      <Users size={24} />
+                    </div>
+                  )}
                 </td>
-                <td style={{ padding: '16px' }}>{socio.cuit || 'No registrado'}</td>
-                <td style={{ padding: '16px', fontWeight: '600', color: socio.saldo_cuenta_corriente < 0 ? 'var(--error)' : 'var(--primary)' }}>
-                  $ {Number(socio.saldo_cuenta_corriente || 0).toLocaleString('es-AR')}
+                <td style={{ padding: '16px' }}>
+                  <div style={{ fontWeight: '600' }}>{socio.nombre || 'Sin nombre'}</div>
                 </td>
                 <td style={{ padding: '16px' }}>
                   <span style={{ 
@@ -218,7 +240,7 @@ function Socios() {
             ))}
             {filteredSocios.length === 0 && (
               <tr>
-                <td colSpan="5" style={{ padding: '2rem', textAlign: 'center', color: 'var(--on-surface-variant)' }}>
+                <td colSpan="4" style={{ padding: '2rem', textAlign: 'center', color: 'var(--on-surface-variant)' }}>
                   No se encontraron socios.
                 </td>
               </tr>
@@ -276,28 +298,6 @@ function Socios() {
                   />
                 </div>
 
-                <div>
-                  <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '500', fontSize: '0.9rem' }}>CUIT *</label>
-                  <input 
-                    type="text" 
-                    value={formData.cuit} 
-                    onChange={e => setFormData({ ...formData, cuit: e.target.value })} 
-                    required 
-                    style={{ width: '100%', padding: '10px', borderRadius: '8px', border: '1px solid var(--outline-variant)' }}
-                  />
-                </div>
-
-                <div>
-                  <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '500', fontSize: '0.9rem' }}>Saldo CC ($)</label>
-                  <input 
-                    type="number" 
-                    step="0.01"
-                    value={formData.saldo_cuenta_corriente} 
-                    onChange={e => setFormData({ ...formData, saldo_cuenta_corriente: e.target.value })} 
-                    style={{ width: '100%', padding: '10px', borderRadius: '8px', border: '1px solid var(--outline-variant)' }}
-                  />
-                  <small style={{ color: 'var(--on-surface-variant)', display: 'block', marginTop: '4px' }}>Valores positivos indican deuda a favor de AJIEP.</small>
-                </div>
 
                 <div>
                   <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '500', fontSize: '0.9rem' }}>Estado</label>
@@ -309,6 +309,47 @@ function Socios() {
                     <option value="Activo">Activo</option>
                     <option value="Inactivo">Inactivo</option>
                   </select>
+                </div>
+
+                <div>
+                  <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '600', fontSize: '0.85rem' }}>Logo del Socio (Imagen)</label>
+                  <div style={{ 
+                    border: '2px dashed var(--outline-variant)', 
+                    padding: '1.5rem', 
+                    borderRadius: '12px', 
+                    textAlign: 'center',
+                    backgroundColor: selectedFile ? 'rgba(0, 94, 184, 0.05)' : 'transparent',
+                    position: 'relative',
+                    transition: 'all 0.2s'
+                  }}>
+                    <input 
+                      type="file" 
+                      accept="image/*"
+                      onChange={e => setSelectedFile(e.target.files[0])}
+                      style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', opacity: 0, cursor: 'pointer' }}
+                    />
+                    {selectedFile ? (
+                      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', color: 'var(--primary)' }}>
+                        <Camera size={20} />
+                        <span style={{ fontSize: '0.85rem', fontWeight: '600' }}>{selectedFile.name}</span>
+                      </div>
+                    ) : (
+                      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '8px' }}>
+                        {formData.avatar ? (
+                          <img 
+                            src={`${directus.url}assets/${formData.avatar}?width=60&height=60`} 
+                            alt="Preview" 
+                            style={{ width: '60px', height: '60px', borderRadius: '50%', objectFit: 'cover', marginBottom: '8px' }} 
+                          />
+                        ) : (
+                          <Upload size={24} color="var(--on-surface-variant)" />
+                        )}
+                        <p style={{ fontSize: '0.8rem', color: 'var(--on-surface-variant)', margin: 0 }}>
+                          {formData.avatar ? 'Haz click para cambiar el logo' : 'Arrastra o haz click para subir logo'}
+                        </p>
+                      </div>
+                    )}
+                  </div>
                 </div>
 
                 <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '1rem', marginTop: '1rem' }}>
