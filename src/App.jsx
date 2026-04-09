@@ -6,6 +6,7 @@ import Login from './pages/Login';
 import Dashboard from './pages/Dashboard';
 import Billing from './pages/Billing';
 import Biblio from './pages/Biblio';
+import BiblioDetail from './pages/BiblioDetail';
 import Socios from './pages/Socios';
 import Usuarios from './pages/Usuarios';
 import EstadosContables from './pages/EstadosContables';
@@ -65,6 +66,10 @@ function App() {
           <Route 
             path="/biblio" 
             element={user ? <Layout user={user}><PageWrapper><Biblio /></PageWrapper></Layout> : <Navigate to="/login" />} 
+          />
+          <Route 
+            path="/biblio/:id" 
+            element={user ? <Layout user={user}><PageWrapper><BiblioDetail /></PageWrapper></Layout> : <Navigate to="/login" />} 
           />
           <Route 
             path="/socios" 

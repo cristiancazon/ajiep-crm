@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import { directus } from '../lib/directus';
 import { 
   readItems, 
@@ -241,15 +242,13 @@ function Biblio() {
                     </>
                   )}
                   {doc.archivo && (
-                    <a 
-                      href={`${directus.url}assets/${doc.archivo}`} 
-                      target="_blank" 
-                      rel="noreferrer"
+                    <Link 
+                      to={`/biblio/${doc.id}`}
                       className="btn-primary" 
                       style={{ padding: '8px 12px', fontSize: '0.75rem', display: 'flex', alignItems: 'center', gap: '6px', textDecoration: 'none' }}
                     >
-                      <Download size={16} /> Abrir
-                    </a>
+                      <FileBadge size={16} /> Ver Detalle
+                    </Link>
                   )}
                 </div>
               </div>
