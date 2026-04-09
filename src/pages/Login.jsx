@@ -17,26 +17,29 @@ function Login({ onLogin }) {
     setError('');
 
     try {
-      // Si el usuario no tiene el dominio @sistema.com, se lo agregamos automáticamente
-      const fullEmail = username.trim().includes('@') 
+      // 1. Aseguramos el dominio @sistema.com antes de iniciar sesión
+      const emailToLogin = username.trim().includes('@') 
         ? username.trim() 
         : `${username.trim()}@sistema.com`;
 
-      // Usamos objeto para login (requerido por versiones recientes del SDK como la v21 instalada)
-      await directus.login({ 
-        email: fullEmail, 
-        password: password.trim() 
-      });
+      console.log('🔑 Intentando entrar con:', emailToLogin);
+
+      // Usamos tres argumentos para evitar que el SDK confunda el password con un objeto de opciones.
+      // Esto soluciona el error: TypeError: Cannot use 'in' operator to search for 'otp' in [password]
+      await directus.login(emailToLogin, password.trim(), {});
       
-      // Ahora App.jsx podrá usar readMe() sin error 401.
       onLogin();
-      
     } catch (err) {
-      console.error('ERROR DETECTADO EN LOGIN CRUDA:', err);
+      console.error('ERROR DETECTADO EN LOGIN:', err);
       let msg = 'Error de conexión o configuración.';
+      
+      // Manejo de errores de Directus
       if (err.errors && err.errors[0]?.extensions?.code === 'INVALID_CREDENTIALS') {
-        msg = 'Contraseña o Mail incorrecto en la Base de Datos.';
+        msg = 'Usuario o contraseña incorrectos.';
+      } else if (err.status === 400) {
+        msg = 'Error en el formato de la solicitud (400).';
       }
+      
       setError(msg);
     } finally {
       setLoading(false);
