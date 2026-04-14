@@ -1,13 +1,14 @@
 import React, { useState } from 'react';
 import { directus } from '../lib/directus';
-import logo from '../assets/logo.jpg';
-import { LogIn, Mail, Lock } from 'lucide-react';
+import logo from '../assets/logo.png';
+import { LogIn, Mail, Lock, Eye, EyeOff } from 'lucide-react';
 
 console.log('🔑 Login.jsx restaurado a código limpio');
 
 function Login({ onLogin }) {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
 
@@ -70,13 +71,39 @@ function Login({ onLogin }) {
 
           <div style={{ marginBottom: '2rem' }}>
             <label style={{ display: 'block', marginBottom: '0.5rem' }}>Contraseña</label>
-            <input 
-              type="password" 
-              value={password} 
-              onChange={(e) => setPassword(e.target.value)} 
-              required 
-              style={{ width: '100%', padding: '12px', borderRadius: '8px', border: '1px solid var(--outline-variant)' }}
-            />
+            <div style={{ position: 'relative' }}>
+              <input 
+                type={showPassword ? "text" : "password"} 
+                value={password} 
+                onChange={(e) => setPassword(e.target.value)} 
+                required 
+                style={{ width: '100%', padding: '12px 45px 12px 12px', borderRadius: '8px', border: '1px solid var(--outline-variant)' }}
+              />
+              <button
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                style={{
+                  position: 'absolute',
+                  right: '12px',
+                  top: '50%',
+                  transform: 'translateY(-50%)',
+                  background: 'none',
+                  border: 'none',
+                  cursor: 'pointer',
+                  color: 'var(--on-surface-variant)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  padding: '4px',
+                  borderRadius: '4px',
+                  transition: 'background-color 0.2s'
+                }}
+                onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'rgba(0,0,0,0.05)'}
+                onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
+                title={showPassword ? "Ocultar contraseña" : "Ver contraseña"}
+              >
+                {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+              </button>
+            </div>
           </div>
 
           {error && <p style={{ color: 'var(--error)', marginBottom: '1rem', textAlign: 'center', fontWeight: 'bold' }}>{error}</p>}

@@ -3,7 +3,7 @@ import { NavLink, useNavigate, useLocation } from 'react-router-dom';
 import { directus } from '../lib/directus';
 import { updateMe } from '@directus/sdk';
 import { motion, AnimatePresence } from 'framer-motion';
-import logo from '../assets/logo.jpg';
+import logo from '../assets/logo.png';
 import { 
   Home, 
   CreditCard, 
