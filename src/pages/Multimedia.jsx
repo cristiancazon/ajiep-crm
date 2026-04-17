@@ -5,8 +5,7 @@ import {
   createItem, 
   updateItem, 
   deleteItem, 
-  uploadFiles, 
-  readMe 
+  uploadFiles 
 } from '@directus/sdk';
 import { 
   Image as ImageIcon, 
@@ -17,16 +16,15 @@ import {
   X, 
   Upload,
   Search,
-  MoreVertical,
   PlayCircle
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { Link } from 'react-router-dom';
 
-function Multimedia() {
+function Multimedia({ user }) {
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
-  const [user, setUser] = useState(null);
 
   // Modal State
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -45,14 +43,10 @@ function Multimedia() {
   async function fetchInitialData() {
     setLoading(true);
     try {
-      const [meRes, itemsRes] = await Promise.all([
-        directus.request(readMe()),
-        directus.request(readItems('multimedia', {
-          fields: ['*', 'archivos.*', 'archivos.directus_files_id.*'],
-          sort: ['-date_created']
-        }))
-      ]);
-      setUser(meRes);
+      const itemsRes = await directus.request(readItems('multimedia', {
+        fields: ['*', 'archivos.*', 'archivos.directus_files_id.*'],
+        sort: ['-date_created']
+      }));
       setItems(itemsRes);
     } catch (err) {
       console.error('Error fetching multimedia:', err);
@@ -105,7 +99,6 @@ function Multimedia() {
       if (selectedFiles.length > 0) {
         for (const file of selectedFiles) {
           const fileForm = new FormData();
-          // Carpeta para Multimedia (puedes ajustar el ID si tienes una específica)
           fileForm.append('file', file);
           
           const uploadRes = await directus.request(uploadFiles(fileForm));
@@ -119,17 +112,10 @@ function Multimedia() {
 
       const payload = {
         ...formData,
-        // Si estamos editando, mantenemos los archivos anteriores o agregamos los nuevos
-        // En Directus, para M2M, si enviamos un array de objetos se agregan.
-        // Si queremos REEMPLAZAR, tendríamos que manejarlo de otra forma, 
-        // pero aquí vamos a agregar los nuevos a los existentes por simplicidad.
         archivos: archivosPayload
       };
 
       if (editingItem) {
-        // Para actualizar y mantener archivos viejos + nuevos:
-        // Directus maneja el delta si se pasan los IDs. 
-        // Aquí simplemente enviamos los nuevos para que se adjunten.
         await directus.request(updateItem('multimedia', editingItem.id, payload));
       } else {
         await directus.request(createItem('multimedia', payload));
@@ -214,7 +200,7 @@ function Multimedia() {
                           src={getFileUrl(item.archivos[0].directus_files_id.id)} 
                           style={{ width: '100%', height: '100%', objectFit: 'cover', opacity: 0.6 }}
                         />
-                        <div style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate' }}>
+                        <div style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)' }}>
                            <PlayCircle size={48} color="white" />
                         </div>
                       </div>
@@ -246,12 +232,21 @@ function Multimedia() {
                     </div>
                   )}
                 </div>
-                <p style={{ fontSize: '0.85rem', color: 'var(--on-surface-variant)', marginBottom: '1rem', lineClamp: 2, display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
+                <p style={{ fontSize: '0.85rem', color: 'var(--on-surface-variant)', marginBottom: '1.5rem', lineClamp: 2, display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
                   {item.descripcion || 'Sin descripción.'}
                 </p>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: 'var(--on-surface-variant)', fontSize: '0.75rem' }}>
-                   {item.archivos?.some(a => isVideo(a.directus_files_id.type)) ? <Film size={14} /> : <ImageIcon size={14} />}
-                   {item.archivos?.length || 0} Archivos • {new Date(item.date_created).toLocaleDateString()}
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: 'var(--on-surface-variant)', fontSize: '0.75rem' }}>
+                    {item.archivos?.some(a => isVideo(a.directus_files_id.type)) ? <Film size={14} /> : <ImageIcon size={14} />}
+                    {item.archivos?.length || 0} Archivos • {new Date(item.date_created).toLocaleDateString()}
+                  </div>
+                  <Link 
+                    to={`/multimedia/${item.id}`} 
+                    className="btn-primary" 
+                    style={{ padding: '8px 12px', fontSize: '0.75rem', textDecoration: 'none', display: 'flex', alignItems: 'center', gap: '6px' }}
+                  >
+                    <PlayCircle size={14} /> Ver Galería
+                  </Link>
                 </div>
               </div>
             </div>

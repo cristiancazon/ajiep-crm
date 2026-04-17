@@ -12,6 +12,7 @@ import Usuarios from './pages/Usuarios';
 import EstadosContables from './pages/EstadosContables';
 import Notifications from './pages/Notifications';
 import Multimedia from './pages/Multimedia';
+import MultimediaDetail from './pages/MultimediaDetail';
 import Layout from './components/Layout';
 import { AnimatePresence, motion } from 'framer-motion';
 
@@ -58,39 +59,43 @@ function App() {
           />
           <Route 
             path="/" 
-            element={user ? <Layout user={user}><PageWrapper><Dashboard /></PageWrapper></Layout> : <Navigate to="/login" />} 
+            element={user ? <Layout user={user}><PageWrapper><Dashboard user={user} /></PageWrapper></Layout> : <Navigate to="/login" />} 
           />
           <Route 
             path="/billing" 
-            element={user ? <Layout user={user}><PageWrapper><Billing /></PageWrapper></Layout> : <Navigate to="/login" />} 
+            element={user ? <Layout user={user}><PageWrapper><Billing user={user} /></PageWrapper></Layout> : <Navigate to="/login" />} 
           />
           <Route 
             path="/biblio" 
-            element={user ? <Layout user={user}><PageWrapper><Biblio /></PageWrapper></Layout> : <Navigate to="/login" />} 
+            element={user ? <Layout user={user}><PageWrapper><Biblio user={user} /></PageWrapper></Layout> : <Navigate to="/login" />} 
           />
           <Route 
             path="/biblio/:id" 
-            element={user ? <Layout user={user}><PageWrapper><BiblioDetail /></PageWrapper></Layout> : <Navigate to="/login" />} 
+            element={user ? <Layout user={user}><PageWrapper><BiblioDetail user={user} /></PageWrapper></Layout> : <Navigate to="/login" />} 
           />
           <Route 
             path="/multimedia" 
-            element={user ? <Layout user={user}><PageWrapper><Multimedia /></PageWrapper></Layout> : <Navigate to="/login" />} 
+            element={user ? <Layout user={user}><PageWrapper><Multimedia user={user} /></PageWrapper></Layout> : <Navigate to="/login" />} 
+          />
+          <Route 
+            path="/multimedia/:id" 
+            element={user ? <Layout user={user}><PageWrapper><MultimediaDetail user={user} /></PageWrapper></Layout> : <Navigate to="/login" />} 
           />
           <Route 
             path="/socios" 
-            element={user ? <Layout user={user}><PageWrapper><Socios /></PageWrapper></Layout> : <Navigate to="/login" />} 
+            element={user ? <Layout user={user}><PageWrapper><Socios user={user} /></PageWrapper></Layout> : <Navigate to="/login" />} 
           />
           <Route 
             path="/usuarios" 
-            element={user ? <Layout user={user}><PageWrapper><Usuarios /></PageWrapper></Layout> : <Navigate to="/login" />} 
+            element={user ? <Layout user={user}><PageWrapper><Usuarios user={user} /></PageWrapper></Layout> : <Navigate to="/login" />} 
           />
           <Route 
             path="/estados-contables" 
-            element={user ? <Layout user={user}><PageWrapper><EstadosContables /></PageWrapper></Layout> : <Navigate to="/login" />} 
+            element={user ? <Layout user={user}><PageWrapper><EstadosContables user={user} /></PageWrapper></Layout> : <Navigate to="/login" />} 
           />
           <Route 
             path="/notifications" 
-            element={user ? <Layout user={user}><PageWrapper><Notifications /></PageWrapper></Layout> : <Navigate to="/login" />} 
+            element={user ? <Layout user={user}><PageWrapper><Notifications user={user} /></PageWrapper></Layout> : <Navigate to="/login" />} 
           />
           <Route path="*" element={<Navigate to="/" />} />
         </Routes>
