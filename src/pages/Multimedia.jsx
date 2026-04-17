@@ -45,11 +45,20 @@ function Multimedia({ user }) {
     try {
       const itemsRes = await directus.request(readItems('multimedia', {
         fields: ['*', 'archivos.*', 'archivos.directus_files_id.*'],
-        sort: ['-date_created']
+        sort: ['-fecha_creacion'] // Cambiado de date_created a fecha_creacion siguiendo el patrón de Biblio
       }));
       setItems(itemsRes);
     } catch (err) {
       console.error('Error fetching multimedia:', err);
+      // Si falla por el sort, reintentar sin sort por si acaso
+      try {
+        const fallbackRes = await directus.request(readItems('multimedia', {
+          fields: ['*', 'archivos.*', 'archivos.directus_files_id.*']
+        }));
+        setItems(fallbackRes);
+      } catch (fallbackErr) {
+        console.error('Fallback fetch failed:', fallbackErr);
+      }
     } finally {
       setLoading(false);
     }
@@ -102,7 +111,8 @@ function Multimedia({ user }) {
           fileForm.append('file', file);
           
           const uploadRes = await directus.request(uploadFiles(fileForm));
-          uploadedFileIds.push(Array.isArray(uploadRes) ? uploadRes[0].id : uploadRes.id);
+          const fileId = Array.isArray(uploadRes) ? uploadRes[0].id : uploadRes.id;
+          uploadedFileIds.push(fileId);
         }
       }
 
@@ -112,7 +122,9 @@ function Multimedia({ user }) {
 
       const payload = {
         ...formData,
-        archivos: archivosPayload
+        archivos: archivosPayload,
+        // Siguiendo el patrón de Biblio.jsx, gestionamos la fecha manualmente si no es automática
+        fecha_creacion: editingItem ? editingItem.fecha_creacion : new Date().toISOString()
       };
 
       if (editingItem) {
@@ -125,7 +137,7 @@ function Multimedia({ user }) {
       handleCloseModal();
     } catch (err) {
       console.error('Error saving multimedia:', err);
-      alert('Error al guardar el registro multimedia.');
+      alert('Error al guardar el registro multimedia: ' + (err.message || 'Desconocido'));
     } finally {
       setSaving(false);
     }
@@ -192,7 +204,7 @@ function Multimedia({ user }) {
             <div key={item.id} className="card ghost-border" style={{ padding: 0, overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
               {/* Preview Area (First file) */}
               <div style={{ height: '200px', backgroundColor: '#000', position: 'relative', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                {item.archivos && item.archivos.length > 0 ? (
+                {item.archivos && item.archivos.length > 0 && item.archivos[0].directus_files_id ? (
                   <>
                     {isVideo(item.archivos[0].directus_files_id.type) ? (
                       <div style={{ position: 'relative', width: '100%', height: '100%' }}>
@@ -237,8 +249,8 @@ function Multimedia({ user }) {
                 </p>
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: 'var(--on-surface-variant)', fontSize: '0.75rem' }}>
-                    {item.archivos?.some(a => isVideo(a.directus_files_id.type)) ? <Film size={14} /> : <ImageIcon size={14} />}
-                    {item.archivos?.length || 0} Archivos • {new Date(item.date_created).toLocaleDateString()}
+                    {item.archivos?.some(a => a.directus_files_id && isVideo(a.directus_files_id.type)) ? <Film size={14} /> : <ImageIcon size={14} />}
+                    {item.archivos?.length || 0} Archivos • {item.fecha_creacion ? new Date(item.fecha_creacion).toLocaleDateString() : 'S/F'}
                   </div>
                   <Link 
                     to={`/multimedia/${item.id}`} 

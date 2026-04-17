@@ -69,7 +69,7 @@ function MultimediaDetail({ user }) {
         <h2 style={{ fontSize: '2rem', marginBottom: '1rem' }}>{item.nombre}</h2>
         <p style={{ color: 'var(--on-surface-variant)', lineHeight: '1.6', fontSize: '1.1rem' }}>{item.descripcion}</p>
         <div style={{ marginTop: '1.5rem', display: 'flex', gap: '1.5rem', fontSize: '0.85rem', color: 'var(--on-surface-variant)' }}>
-           <span>📅 {new Date(item.date_created).toLocaleDateString()}</span>
+           <span>📅 {item.fecha_creacion ? new Date(item.fecha_creacion).toLocaleDateString() : 'S/F'}</span>
            <span>📁 {item.archivos?.length || 0} Archivos</span>
         </div>
       </div>
