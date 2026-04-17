@@ -3,7 +3,7 @@ import { createDirectus, rest, authentication } from '@directus/sdk';
 // 1. Obtener la URL base completa para evitar "Invalid URL" y pantalla en blanco
 const isLocalhost = typeof window !== 'undefined' && window.location.origin.includes('localhost');
 const rawUrl = isLocalhost ? `${window.location.origin}/directus-proxy` : (import.meta.env.VITE_DIRECTUS_URL || 'https://xer.pascalito.com.ar');
-const DIRECTUS_URL = rawUrl.replace(/\/+$/, '') + '/';
+export const DIRECTUS_URL = rawUrl.replace(/\/+$/, '') + '/';
 
 console.log('🔗 URL de Directus activa:', DIRECTUS_URL);
 

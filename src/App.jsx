@@ -11,6 +11,7 @@ import Socios from './pages/Socios';
 import Usuarios from './pages/Usuarios';
 import EstadosContables from './pages/EstadosContables';
 import Notifications from './pages/Notifications';
+import Multimedia from './pages/Multimedia';
 import Layout from './components/Layout';
 import { AnimatePresence, motion } from 'framer-motion';
 
@@ -70,6 +71,10 @@ function App() {
           <Route 
             path="/biblio/:id" 
             element={user ? <Layout user={user}><PageWrapper><BiblioDetail /></PageWrapper></Layout> : <Navigate to="/login" />} 
+          />
+          <Route 
+            path="/multimedia" 
+            element={user ? <Layout user={user}><PageWrapper><Multimedia /></PageWrapper></Layout> : <Navigate to="/login" />} 
           />
           <Route 
             path="/socios" 
