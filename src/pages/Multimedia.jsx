@@ -203,7 +203,10 @@ function Multimedia({ user }) {
           filteredItems.map(item => (
             <div key={item.id} className="card ghost-border" style={{ padding: 0, overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
               {/* Preview Area (First file) */}
-              <div style={{ height: '200px', backgroundColor: '#000', position: 'relative', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+              <Link 
+                to={`/multimedia/${item.id}`} 
+                style={{ height: '200px', backgroundColor: '#000', position: 'relative', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', textDecoration: 'none' }}
+              >
                 {item.archivos && item.archivos.length > 0 && item.archivos[0].directus_files_id ? (
                   <>
                     {isVideo(item.archivos[0].directus_files_id.type) ? (
@@ -230,13 +233,19 @@ function Multimedia({ user }) {
                     )}
                   </>
                 ) : (
-                  <ImageIcon size={48} color="rgba(255,255,255,0.2)" />
+                  <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                    <ImageIcon size={48} color="rgba(255,255,255,0.2)" />
+                  </div>
                 )}
-              </div>
+              </Link>
 
               <div style={{ padding: '1.5rem' }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '0.5rem' }}>
-                  <h4 style={{ margin: 0 }}>{item.nombre}</h4>
+                  <h4 style={{ margin: 0 }}>
+                    <Link to={`/multimedia/${item.id}`} style={{ textDecoration: 'none', color: 'inherit' }}>
+                      {item.nombre}
+                    </Link>
+                  </h4>
                   {user?.es_administrador && (
                     <div style={{ display: 'flex', gap: '8px' }}>
                       <button onClick={() => handleOpenModal(item)} style={{ color: 'var(--primary)', background: 'transparent', border: 'none', cursor: 'pointer' }}><Edit2 size={16} /></button>

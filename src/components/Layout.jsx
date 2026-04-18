@@ -24,11 +24,20 @@ import {
 function Layout({ children, user }) {
   const navigate = useNavigate();
   const location = useLocation();
-  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-
-  // Close sidebar on route change (mobile)
+  const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
+  
+  // En móviles empezamos colapsados
   useEffect(() => {
-    setIsSidebarOpen(false);
+    if (window.innerWidth <= 768) {
+      setIsSidebarCollapsed(true);
+    }
+  }, []);
+
+  // Close expanded sidebar on route change on mobile
+  useEffect(() => {
+    if (window.innerWidth <= 768) {
+      setIsSidebarCollapsed(true);
+    }
   }, [location.pathname]);
 
   const handleLogout = async () => {
@@ -88,83 +97,34 @@ function Layout({ children, user }) {
 
   return (
     <div className="app-layout">
-      {/* Mobile Header */}
-      <div 
-        className="glass ghost-border"
-        style={{ 
-          display: 'none', 
-          position: 'fixed', 
-          top: 0, 
-          left: 0, 
-          right: 0, 
-          height: '64px', 
-          padding: '0 1rem',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-          zIndex: 1000,
-        }}
-        id="mobile-header"
-      >
-        <button 
-          onClick={() => setIsSidebarOpen(true)}
-          style={{ background: 'transparent', color: 'var(--primary)', border: 'none', cursor: 'pointer' }}
-        >
-          <Menu size={24} />
-        </button>
-        <img src={logo} alt="Logo" style={{ height: '32px' }} />
-        <div style={{ width: '24px' }}></div> {/* Spacer */}
-      </div>
-
-      <style>
-        {`
-          @media (max-width: 768px) {
-            #mobile-header { display: flex !important; }
-          }
-        `}
-      </style>
-
-      {/* Sidebar Overlay */}
-      <AnimatePresence>
-        {isSidebarOpen && (
-          <motion.div 
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            onClick={() => setIsSidebarOpen(false)}
-            style={{ 
-              position: 'fixed', 
-              top: 0, 
-              left: 0, 
-              right: 0, 
-              bottom: 0, 
-              backgroundColor: 'rgba(0,0,0,0.5)', 
-              zIndex: 90 
-            }}
-          />
-        )}
-      </AnimatePresence>
-
-      <aside className={`sidebar ${isSidebarOpen ? 'open' : ''}`}>
-        <div style={{ marginBottom: '2.5rem', textAlign: 'center', position: 'relative' }}>
-          <img src={logo} alt="AJIEP Logo" style={{ maxWidth: '140px' }} />
+      <aside className={`sidebar ${isSidebarCollapsed ? 'collapsed' : ''}`}>
+        <div className="sidebar-header" style={{ marginBottom: '2.5rem', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '10px', padding: '0 8px' }}>
+          {!isSidebarCollapsed && (
+            <img src={logo} alt="AJIEP Logo" className="logo-full" style={{ maxWidth: '120px' }} />
+          )}
+          {isSidebarCollapsed && (
+             <img src={logo} alt="Logo" style={{ width: '32px', height: '32px', objectFit: 'contain' }} />
+          )}
           <button 
-            className="mobile-only"
-            onClick={() => setIsSidebarOpen(false)}
-            style={{ position: 'absolute', right: 0, top: 0, display: 'none', background: 'transparent', border: 'none', cursor: 'pointer' }}
-            id="close-sidebar"
+            onClick={() => setIsSidebarCollapsed(!isSidebarCollapsed)}
+            style={{ 
+              background: 'var(--surface-container-high)', 
+              color: 'var(--primary)', 
+              border: 'none', 
+              cursor: 'pointer',
+              width: '32px',
+              height: '32px',
+              borderRadius: '8px',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              flexShrink: 0
+            }}
           >
-            <X size={24} />
+            {isSidebarCollapsed ? <Menu size={18} /> : <X size={18} />}
           </button>
         </div>
         
-        <style>
-          {`
-            @media (max-width: 768px) {
-              #close-sidebar { display: block !important; }
-            }
-          `}
-        </style>
-
         <nav style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
           {menuItems.map((item) => (
             <NavLink 
@@ -181,32 +141,52 @@ function Layout({ children, user }) {
                 color: isActive ? 'var(--primary)' : 'var(--on-surface-variant)',
                 backgroundColor: isActive ? 'var(--surface-container-high)' : 'transparent',
                 fontWeight: isActive ? '600' : '400',
-                transition: 'all 0.2s ease'
+                transition: 'all 0.2s ease',
+                whiteSpace: 'nowrap'
               })}
+              title={isSidebarCollapsed ? item.label : ''}
             >
-              {item.icon}
-              {item.label}
+              <span style={{ flexShrink: 0 }}>{item.icon}</span>
+              {!isSidebarCollapsed && <span className="nav-label">{item.label}</span>}
             </NavLink>
           ))}
         </nav>
 
         <div style={{ marginTop: 'auto', borderTop: '1px solid var(--outline-variant)', paddingTop: '1.5rem' }}>
           {user.es_administrador && (
-            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '8px 16px', backgroundColor: 'rgba(0, 94, 184, 0.1)', borderRadius: '8px', marginBottom: '1rem', color: 'var(--primary)', fontSize: '0.8rem', fontWeight: '700' }}>
-              <ShieldCheck size={16} />
-              ADMINISTRADOR
+            <div 
+              style={{ 
+                display: 'flex', 
+                alignItems: 'center', 
+                gap: '8px', 
+                padding: '8px 16px', 
+                backgroundColor: 'rgba(0, 94, 184, 0.1)', 
+                borderRadius: '8px', 
+                marginBottom: '1rem', 
+                color: 'var(--primary)', 
+                fontSize: '0.8rem', 
+                fontWeight: '700',
+                justifyContent: isSidebarCollapsed ? 'center' : 'flex-start'
+              }}
+              title="ADMINISTRADOR"
+            >
+              <ShieldCheck size={16} style={{ flexShrink: 0 }} />
+              {!isSidebarCollapsed && <span className="admin-badge-text">ADMINISTRADOR</span>}
             </div>
           )}
-          <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '1rem', padding: '0 8px' }}>
-            <div style={{ width: '40px', height: '40px', borderRadius: '50%', backgroundColor: 'var(--primary)', color: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+          
+          <div className="profile-section" style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '1rem', padding: '0 8px' }}>
+            <div style={{ width: '40px', height: '40px', borderRadius: '50%', backgroundColor: 'var(--primary)', color: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
               <User size={20} />
             </div>
-            <div style={{ overflow: 'hidden' }}>
-              <p style={{ fontWeight: '600', fontSize: '0.85rem', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                {user.first_name || user.email.split('@')[0]}
-              </p>
-              <p style={{ fontSize: '0.7rem', color: 'var(--on-surface-variant)', textTransform: 'uppercase' }}>{user.es_administrador ? 'Directiva' : 'Socio'}</p>
-            </div>
+            {!isSidebarCollapsed && (
+              <div className="profile-text" style={{ overflow: 'hidden' }}>
+                <p style={{ fontWeight: '600', fontSize: '0.85rem', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                  {user.first_name || user.email.split('@')[0]}
+                </p>
+                <p style={{ fontSize: '0.7rem', color: 'var(--on-surface-variant)', textTransform: 'uppercase' }}>{user.es_administrador ? 'Directiva' : 'Socio'}</p>
+              </div>
+            )}
           </div>
           
           <button 
@@ -222,11 +202,13 @@ function Layout({ children, user }) {
               borderRadius: '8px',
               textAlign: 'left',
               fontWeight: '600',
-              fontSize: '0.9rem'
+              fontSize: '0.9rem',
+              justifyContent: isSidebarCollapsed ? 'center' : 'flex-start'
             }}
+            title="Cerrar Sesión"
           >
-            <LogOut size={20} />
-            Cerrar Sesión
+            <LogOut size={20} style={{ flexShrink: 0 }} />
+            {!isSidebarCollapsed && <span className="logout-text">Cerrar Sesión</span>}
           </button>
         </div>
       </aside>
