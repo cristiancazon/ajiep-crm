@@ -87,25 +87,28 @@ function Dashboard() {
   const handleUpdateConfig = async () => {
     setIsSavingConfig(true);
     try {
-      const payload = {
-        valor_cuota_actual: Number(config.valor_cuota_actual)
-      };
+      // Clonamos el objeto y eliminamos campos de sistema que Directus rechaza en un PATCH
+      const payload = { ...config };
+      delete payload.id;
+      delete payload.user_created;
+      delete payload.date_created;
+      delete payload.user_updated;
+      delete payload.date_updated;
       
-      console.log('📤 Enviando actualización (Payload):', payload);
-      console.log('🆔 ID del registro:', config.id);
+      // Aseguramos que el valor de la cuota sea un número
+      payload.valor_cuota_actual = Number(payload.valor_cuota_actual);
+      
+      console.log('📤 Enviando actualización (Payload completo):', payload);
 
-      // Si readSingleton devolvió un ID, usamos updateItem que es más preciso.
-      // Si no, usamos el método singleton estándar.
-      if (config.id) {
-        await directus.request(updateItem('configuracion', config.id, payload));
-      } else {
-        await directus.request(updateSingleton('configuracion', payload));
-      }
+      // Usamos updateSingleton que es el método correcto para este tipo de colección
+      await directus.request(updateSingleton('configuracion', payload));
       
       alert('Configuración actualizada correctamente');
     } catch (err) {
-      console.error('❌ Error fatal al actualizar config:', err);
-      alert('Error 400: El servidor rechazó la solicitud. Esto suele deberse a falta de permisos de "Update" en la colección "configuracion" para tu rol en Directus.');
+      console.error('❌ Error al actualizar config:', err);
+      // Intentamos extraer el mensaje de error específico de Directus
+      const specificError = err.errors?.[0]?.message || (err.response?.statusText) || 'Error desconocido';
+      alert(`Error 400: ${specificError}. Revisa si hay campos requeridos faltantes.`);
     } finally {
       setIsSavingConfig(false);
     }
