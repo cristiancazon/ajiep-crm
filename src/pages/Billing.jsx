@@ -147,9 +147,9 @@ function Billing() {
           <h2 style={{ fontSize: '1.75rem' }}>{currentUser.es_administrador ? 'Gestión de Pagos' : 'Mis Pagos'}</h2>
           <p style={{ color: 'var(--on-surface-variant)' }}>{currentUser.es_administrador ? 'Valida transferencias y carga recibos oficiales.' : 'Historial y reporte de transferencias.'}</p>
         </div>
-        {!currentUser.es_administrador && (
-          <button className="btn-primary" onClick={() => setShowUpload(!showUpload)} style={{ width: 'auto' }}>Informar Pago</button>
-        )}
+        <button className="btn-primary" onClick={() => setShowUpload(!showUpload)} style={{ width: 'auto' }}>
+          {currentUser.es_administrador ? 'Cargar Pago (Admin)' : 'Informar Pago'}
+        </button>
       </div>
 
       {showUpload && (
@@ -164,6 +164,22 @@ function Billing() {
               <label style={{ display: 'block', marginBottom: '0.4rem', fontSize: '0.85rem', fontWeight: '600' }}>Fecha de Pago</label>
               <input type="date" value={formData.fecha} onChange={e => setFormData({...formData, fecha: e.target.value})} required />
             </div>
+            {currentUser.es_administrador && (
+              <div>
+                <label style={{ display: 'block', marginBottom: '0.4rem', fontSize: '0.85rem', fontWeight: '600' }}>Socio</label>
+                <select 
+                  value={formData.socio_id} 
+                  onChange={e => setFormData({...formData, socio_id: e.target.value})} 
+                  required
+                  style={{ width: '100%', padding: '10px', borderRadius: '8px', border: '1px solid var(--outline-variant)' }}
+                >
+                  <option value="">Seleccionar Socio...</option>
+                  {socios.map(s => (
+                    <option key={s.id} value={s.id}>{s.nombre}</option>
+                  ))}
+                </select>
+              </div>
+            )}
             <div>
               <label style={{ display: 'block', marginBottom: '0.4rem', fontSize: '0.85rem', fontWeight: '600' }}>Adjuntar Foto/PDF</label>
               <input type="file" onChange={e => setFormData({...formData, file: e.target.files[0]})} required />

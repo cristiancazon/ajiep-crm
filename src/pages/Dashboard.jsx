@@ -33,13 +33,22 @@ function Dashboard() {
       setUser(me);
 
       if (me.es_administrador) {
+        if (me.socio_id) {
+          const socioData = await directus.request(readItems('socios', { filter: { id: { _eq: me.socio_id } } }));
+          if (socioData && socioData.length > 0) {
+            setSocio(socioData[0]);
+          }
+        }
         const [socList, payList, confData, unreadData] = await Promise.all([
           directus.request(readItems('socios')),
           directus.request(readItems('pagos', { filter: { estado: { _eq: 'Pendiente' } } })),
           directus.request(readSingleton('configuracion')),
           directus.request(readItems('notificaciones', { 
             filter: { 
-              receptor_socio_id: { _null: true },
+              _or: [
+                { receptor_socio_id: { _null: true } },
+                { receptor_socio_id: { _eq: me.socio_id } }
+              ],
               leido: { _eq: false } 
             } 
           }))
@@ -163,10 +172,15 @@ function Dashboard() {
                   style={{ backgroundColor: 'white' }}
                 />
               </div>
-              <button className="btn-primary" onClick={handleUpdateConfig} disabled={isSavingConfig} style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '8px' }}>
+              <button className="btn-primary" onClick={handleUpdateConfig} disabled={isSavingConfig} style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '8px', marginBottom: user?.socio_id ? '1rem' : '0' }}>
                 <Save size={18} />
                 {isSavingConfig ? 'Guardando...' : 'Guardar Cambios'}
               </button>
+              {user?.socio_id && (
+                <button className="card ghost-border" style={{ width: '100%', fontWeight: '600', height: '48px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }} onClick={() => window.location.href = '/billing'}>
+                  <CreditCard size={18} /> Informar Pago Propio
+                </button>
+              )}
             </div>
           ) : (
             <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>

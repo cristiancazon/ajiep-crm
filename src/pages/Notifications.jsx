@@ -31,16 +31,20 @@ function Notifications() {
       const socioList = await directus.request(readItems('socios'));
       setSocios(socioList.filter(s => s.id !== userData.socio_id));
 
+      const notificationFilter = userData.es_administrador 
+        ? {} 
+        : { 
+            _or: [
+              { emisor_socio_id: { _eq: userData.socio_id } },
+              { receptor_socio_id: { _eq: userData.socio_id } },
+              { receptor_socio_id: { _null: true } }
+            ]
+          };
+
       const msgData = await directus.request(readItems('notificaciones', {
-        filter: { 
-          _or: [
-            { emisor_socio_id: { _eq: userData.socio_id } },
-            { receptor_socio_id: { _eq: userData.socio_id } },
-            { receptor_socio_id: { _null: true } }
-          ]
-        },
+        filter: notificationFilter,
         sort: ['-fecha_envio'],
-        limit: 50
+        limit: 100
       }));
       setMessages(msgData);
 
