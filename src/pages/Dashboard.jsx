@@ -87,16 +87,28 @@ function Dashboard() {
   const handleUpdateConfig = async () => {
     setIsSavingConfig(true);
     try {
-      // Enviamos solo los campos necesarios para evitar errores 400 (Bad Request)
-      // causados por enviar campos de sistema como id, user_created, etc.
       const payload = {
-        valor_cuota_actual: config.valor_cuota_actual
+        valor_cuota_actual: Number(config.valor_cuota_actual)
       };
-      await directus.request(updateSingleton('configuracion', payload));
+      
+      console.log('📤 Enviando actualización de configuración:', payload);
+      
+      // Intentamos con updateItem y ID vacío, que suele funcionar para singletons
+      // si updateSingleton da problemas de compatibilidad.
+      await directus.request(updateItem('configuracion', '', payload));
+      
       alert('Configuración actualizada correctamente');
     } catch (err) {
-      console.error('Error updating config:', err);
-      alert('Error al actualizar la configuración. Revisa la consola para más detalles.');
+      console.error('❌ Error al actualizar config:', err);
+      // Fallback a updateSingleton si el anterior falla
+      try {
+        const payload = { valor_cuota_actual: Number(config.valor_cuota_actual) };
+        await directus.request(updateSingleton('configuracion', payload));
+        alert('Configuración actualizada correctamente (vía singleton)');
+      } catch (err2) {
+        console.error('❌ Error fatal al actualizar config:', err2);
+        alert('Error 400: El servidor rechazó la solicitud. Verifica los campos en Directus.');
+      }
     } finally {
       setIsSavingConfig(false);
     }
