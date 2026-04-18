@@ -91,24 +91,21 @@ function Dashboard() {
         valor_cuota_actual: Number(config.valor_cuota_actual)
       };
       
-      console.log('📤 Enviando actualización de configuración:', payload);
-      
-      // Intentamos con updateItem y ID vacío, que suele funcionar para singletons
-      // si updateSingleton da problemas de compatibilidad.
-      await directus.request(updateItem('configuracion', '', payload));
+      console.log('📤 Enviando actualización (Payload):', payload);
+      console.log('🆔 ID del registro:', config.id);
+
+      // Si readSingleton devolvió un ID, usamos updateItem que es más preciso.
+      // Si no, usamos el método singleton estándar.
+      if (config.id) {
+        await directus.request(updateItem('configuracion', config.id, payload));
+      } else {
+        await directus.request(updateSingleton('configuracion', payload));
+      }
       
       alert('Configuración actualizada correctamente');
     } catch (err) {
-      console.error('❌ Error al actualizar config:', err);
-      // Fallback a updateSingleton si el anterior falla
-      try {
-        const payload = { valor_cuota_actual: Number(config.valor_cuota_actual) };
-        await directus.request(updateSingleton('configuracion', payload));
-        alert('Configuración actualizada correctamente (vía singleton)');
-      } catch (err2) {
-        console.error('❌ Error fatal al actualizar config:', err2);
-        alert('Error 400: El servidor rechazó la solicitud. Verifica los campos en Directus.');
-      }
+      console.error('❌ Error fatal al actualizar config:', err);
+      alert('Error 400: El servidor rechazó la solicitud. Esto suele deberse a falta de permisos de "Update" en la colección "configuracion" para tu rol en Directus.');
     } finally {
       setIsSavingConfig(false);
     }
