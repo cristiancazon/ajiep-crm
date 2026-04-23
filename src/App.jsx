@@ -7,6 +7,7 @@ import Dashboard from './pages/Dashboard';
 import Billing from './pages/Billing';
 import Biblio from './pages/Biblio';
 import BiblioDetail from './pages/BiblioDetail';
+import Comprobantes from './pages/Comprobantes';
 import Socios from './pages/Socios';
 import Usuarios from './pages/Usuarios';
 import EstadosContables from './pages/EstadosContables';
@@ -71,6 +72,14 @@ function App() {
           />
           <Route 
             path="/biblio/:id" 
+            element={user ? <Layout user={user}><PageWrapper><BiblioDetail user={user} /></PageWrapper></Layout> : <Navigate to="/login" />} 
+          />
+          <Route 
+            path="/comprobante" 
+            element={user ? <Layout user={user}><PageWrapper><Comprobantes user={user} /></PageWrapper></Layout> : <Navigate to="/login" />} 
+          />
+          <Route 
+            path="/comprobante/:id" 
             element={user ? <Layout user={user}><PageWrapper><BiblioDetail user={user} /></PageWrapper></Layout> : <Navigate to="/login" />} 
           />
           <Route 

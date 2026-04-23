@@ -79,6 +79,7 @@ function Layout({ children, user }) {
     { icon: <Home size={20} />, label: 'Inicio', path: '/' },
     { icon: <CreditCard size={20} />, label: 'Pagos', path: '/billing' },
     { icon: <BookOpen size={20} />, label: 'Biblioteca', path: '/biblio' },
+    { icon: <FileText size={20} />, label: 'Comprobantes', path: '/comprobante' },
     { icon: <Image size={20} />, label: 'Multimedia', path: '/multimedia' },
     { icon: <FileText size={20} />, label: 'Estados Contables', path: '/estados-contables' },
     { icon: <Bell size={20} />, label: 'Notificaciones', path: '/notifications' },

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useParams, useNavigate, Link } from 'react-router-dom';
+import { useParams, useNavigate, Link, useLocation } from 'react-router-dom';
 import { directus } from '../lib/directus';
 import { readItem } from '@directus/sdk';
 import { 
@@ -16,6 +16,7 @@ import { motion } from 'framer-motion';
 function BiblioDetail() {
   const { id } = useParams();
   const navigate = useNavigate();
+  const location = useLocation();
   const [doc, setDoc] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -70,12 +71,16 @@ function BiblioDetail() {
   const isVideo = fileInfo?.type?.startsWith('video/');
   const isPDF = fileInfo?.type === 'application/pdf';
 
+  const isComprobante = location.pathname.startsWith('/comprobante');
+  const backPath = isComprobante ? '/comprobante' : '/biblio';
+  const backLabel = isComprobante ? 'Volver a Comprobantes' : 'Volver a la Biblioteca';
+
   return (
     <div className="biblio-detail-page">
       <div style={{ marginBottom: '2rem' }}>
-        <Link to="/biblio" style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', color: 'var(--primary)', textDecoration: 'none', fontWeight: '600', fontSize: '0.9rem' }}>
+        <Link to={backPath} style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', color: 'var(--primary)', textDecoration: 'none', fontWeight: '600', fontSize: '0.9rem' }}>
           <ArrowLeft size={18} />
-          Volver a la Biblioteca
+          {backLabel}
         </Link>
       </div>
 
