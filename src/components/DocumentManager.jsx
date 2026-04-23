@@ -26,6 +26,8 @@ function DocumentManager({
   subtitle = "Gestión de documentos", 
   categories = ['Todas', 'Otros'],
   allCategories = null,
+  searchCategories = null,
+  categoryMapping = null,
   basePath = "/biblio"
 }) {
   const [docs, setDocs] = useState([]);
@@ -41,6 +43,7 @@ function DocumentManager({
   const [selectedFile, setSelectedFile] = useState(null);
 
   const filterCategories = categories.filter(c => c !== 'Todas');
+  const fetchCategories = searchCategories || filterCategories;
   const formCategories = (allCategories || categories).filter(c => c !== 'Todas');
 
   const [formData, setFormData] = useState({
@@ -62,13 +65,19 @@ function DocumentManager({
           sort: ['-fecha_creacion'],
           filter: {
             categoria: {
-              _in: filterCategories
+              _in: fetchCategories
             }
           }
         }))
       ]);
+      
+      const normalizedDocs = docsRes.map(doc => ({
+        ...doc,
+        categoria: categoryMapping?.[doc.categoria] || doc.categoria
+      }));
+
       setUser(meRes);
-      setDocs(docsRes);
+      setDocs(normalizedDocs);
     } catch (err) {
       console.error('Error fetching data:', err);
     } finally {
