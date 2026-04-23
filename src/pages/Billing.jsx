@@ -145,7 +145,7 @@ function Billing() {
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2.5rem', flexWrap: 'wrap', gap: '1rem' }}>
         <div style={{ flex: '1', minWidth: '280px' }}>
           <h2 style={{ fontSize: '1.75rem' }}>{currentUser.es_administrador ? 'Gestión de Pagos' : 'Mis Pagos'}</h2>
-          <p style={{ color: 'var(--on-surface-variant)' }}>{currentUser.es_administrador ? 'Valida transferencias y carga recibos oficiales.' : 'Historial y reporte de transferencias.'}</p>
+          <p style={{ color: 'var(--on-surface-variant)' }}>{currentUser.es_administrador ? 'Valida transferencias y carga transferencias oficiales.' : 'Historial y reporte de transferencias.'}</p>
         </div>
         <button className="btn-primary" onClick={() => setShowUpload(!showUpload)} style={{ width: 'auto' }}>
           {currentUser.es_administrador ? 'Cargar Pago (Admin)' : 'Informar Pago'}
@@ -227,10 +227,10 @@ function Billing() {
                           href={`${directus.url}assets/${invoices.find(inv => inv.pago_id === p.id).archivo}`} 
                           target="_blank" 
                           rel="noreferrer" 
-                          title="Descargar Recibo Oficial"
+                          title="Descargar Transferencia Oficial"
                           style={{ display: 'flex', alignItems: 'center', gap: '4px', textDecoration: 'none', color: 'var(--success)', fontSize: '0.8rem', fontWeight: '600' }}
                         >
-                          <FileText size={18} /> Recibo
+                          <FileText size={18} /> Transferencia
                         </a>
                       )}
                     </div>
@@ -247,8 +247,8 @@ function Billing() {
                           </button>
                         )}
                         <label style={{ cursor: 'pointer', padding: '4px 8px', backgroundColor: 'var(--primary)', color: 'white', borderRadius: '4px', fontSize: '0.75rem', display: 'flex', alignItems: 'center', gap: '4px' }}>
-                          <Plus size={14} /> Recibo
-                          <input type="file" style={{ display: 'none' }} onChange={(e) => handleFileUpload(e, 'recibo', p.id, p.socio_id)} />
+                          <Plus size={14} /> Transferencia
+                          <input type="file" style={{ display: 'none' }} onChange={(e) => handleFileUpload(e, 'transferencia', p.id, p.socio_id)} />
                         </label>
                       </div>
                     </td>

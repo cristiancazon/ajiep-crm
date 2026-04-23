@@ -3,7 +3,7 @@ import DocumentManager from '../components/DocumentManager';
 
 function Biblio() {
   const categories = ['Todas', 'Estatuto', 'Actas', 'Convenios', 'Otros'];
-  const allCategories = ['Todas', 'Estatuto', 'Actas', 'Convenios', 'Otros', 'Facturas', 'Recibos'];
+  const allCategories = ['Todas', 'Estatuto', 'Actas', 'Convenios', 'Otros', 'Facturas', 'Transferencia'];
   
   return (
     <DocumentManager 
