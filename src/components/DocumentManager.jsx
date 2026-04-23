@@ -25,6 +25,7 @@ function DocumentManager({
   title = "Documentos", 
   subtitle = "Gestión de documentos", 
   categories = ['Todas', 'Otros'],
+  allCategories = null,
   basePath = "/biblio"
 }) {
   const [docs, setDocs] = useState([]);
@@ -38,13 +39,15 @@ function DocumentManager({
   const [editingDoc, setEditingDoc] = useState(null);
   const [saving, setSaving] = useState(false);
   const [selectedFile, setSelectedFile] = useState(null);
+
+  const filterCategories = categories.filter(c => c !== 'Todas');
+  const formCategories = (allCategories || categories).filter(c => c !== 'Todas');
+
   const [formData, setFormData] = useState({
     titulo: '',
     descripcion: '',
-    categoria: categories[1] || 'Otros'
+    categoria: formCategories[0] || 'Otros'
   });
-
-  const formCategories = categories.filter(c => c !== 'Todas');
 
   useEffect(() => {
     fetchInitialData();
@@ -59,7 +62,7 @@ function DocumentManager({
           sort: ['-fecha_creacion'],
           filter: {
             categoria: {
-              _in: formCategories
+              _in: filterCategories
             }
           }
         }))

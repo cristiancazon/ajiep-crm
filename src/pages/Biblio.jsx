@@ -3,12 +3,14 @@ import DocumentManager from '../components/DocumentManager';
 
 function Biblio() {
   const categories = ['Todas', 'Estatuto', 'Actas', 'Convenios', 'Otros'];
+  const allCategories = ['Todas', 'Estatuto', 'Actas', 'Convenios', 'Otros', 'Facturas', 'Recibos'];
   
   return (
     <DocumentManager 
       title="Biblioteca Digital"
       subtitle="Estatutos, actas, convenios y documentos institucionales."
       categories={categories}
+      allCategories={allCategories}
       basePath="/biblio"
     />
   );
