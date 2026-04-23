@@ -2,17 +2,17 @@ import React from 'react';
 import DocumentManager from '../components/DocumentManager';
 
 function Comprobantes() {
-  const categories = ['Todas', 'Facturas', 'Comprobante'];
-  const searchCategories = ['Facturas', 'Comprobante', 'Transferencia', 'Recibos'];
+  const categories = ['Todas', 'Facturas', 'Transferencia'];
+  const searchCategories = ['Facturas', 'Transferencia', 'Recibos', 'Comprobante'];
   const categoryMapping = {
-    'Recibos': 'Comprobante',
-    'Transferencia': 'Comprobante'
+    'Recibos': 'Transferencia',
+    'Comprobante': 'Transferencia'
   };
   
   return (
     <DocumentManager 
       title="Comprobantes"
-      subtitle="Facturas, comprobante y comprobantes de pago."
+      subtitle="Facturas, transferencias y comprobantes de pago."
       categories={categories}
       searchCategories={searchCategories}
       categoryMapping={categoryMapping}
