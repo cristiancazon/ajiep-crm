@@ -2,12 +2,12 @@ import React from 'react';
 import DocumentManager from '../components/DocumentManager';
 
 function Comprobantes() {
-  const categories = ['Todas', 'Facturas', 'Transferencia'];
+  const categories = ['Todas', 'Facturas', 'Comprobante'];
   
   return (
     <DocumentManager 
       title="Comprobantes"
-      subtitle="Facturas, transferencia y comprobantes de pago."
+      subtitle="Facturas, comprobante y comprobantes de pago."
       categories={categories}
       basePath="/comprobante"
     />
